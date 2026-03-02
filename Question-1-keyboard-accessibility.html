@@ -24,9 +24,11 @@ body {
 a{
   color: #006b3a;
 }
-main a{
+/*main a{
   outline: none;
-}
+  FIXED: Removed 'outline: none' to ensure a visible focus indicator. 
+  This allows keyboard users to see which link is currently active.
+}*/
 h2 {
   margin-top: 0;
 }
@@ -60,7 +62,23 @@ header {
 .offscreen {
   position: absolute;
   left: -10000px;
-  top: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.offscreen:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  background-color: #fff;
+  padding: 15px;
+  border: 2px solid #006b3a;
+  display: block;
+  text-align: center;
+  font-weight: bold;
+  z-index: 1000;
 }
 
 .menu {
@@ -197,6 +215,7 @@ article p {
 </head>
 
 <body>
+  <a href="#main-content" class="offscreen">Skip to main content</a>
   <header>
 
     <div class="container">
@@ -206,7 +225,7 @@ article p {
       <nav class="menu">
         <a href="#">Home</a>
         <a href="#">Politics</a>
-        <a href="#" tabindex="-1">Business</a>
+        <a href="#">Business</a><!--remove tabindex -->
         <a href="#">Entertainment</a>
         <a href="#">Sports</a>
         <a href="#" class="btn-search pull-right"><img src="https://raw.githubusercontent.com/udacity/ud891/2de2a0688c68809a3b453db3a24b1a59e8401459/lesson2-focus/02-dom-order/images/search.svg" alt="Search" />Search</a> 
@@ -214,15 +233,8 @@ article p {
       </nav>
     </div>
   </header>
-  <div class="newsletter">
-    <div class="container">
-      <h3>Like the Funion? Consider joining our newsletter!</h3>
-      <input type="text">
-      <button type="button" onfocus="getFocus()">Sign up</button></div>
-      
-    </div>
-  </div>
-  <main class="container">
+  
+  <main class="container" id="main-content">
     <h2 class="offscreen">Top story</h2>
     <article class="main-story">
       <img class="pull-right" src="https://github.com/udacity/ud891/blob/gh-pages/lesson2-focus/02-dom-order/images/cat.jpg?raw=true" alt="A cat staring menacingly off into space">
@@ -239,11 +251,11 @@ article p {
     <div class="side-by-side">
       <div class="column">
         <div class="tier-header">
-          <h2 tabindex="0">In the news</h2>
+          <h2>In the news</h2> <!--remove  tabindex="0"-->
         </div>
         <article>
           <h3 class="headline">Bee wonders if maybe everyone else is a drone and he's the only one who has it "figured out."</h3>
-          <p><a href="#" tabindex="1"><b>Read More</b></a></p>
+          <p><a href="#"><b>Read More</b></a></p><!--remove  tabindex="1"-->
           <img src="https://github.com/udacity/ud891/blob/gh-pages/lesson2-focus/02-dom-order/images/bee.jpg?raw=true" alt="A bee on top of a flower" />
         </article>
       </div>
@@ -286,10 +298,21 @@ article p {
     </div>
     
   </main>
-  <!--   stuff can be added here :)
+  <!--   newsletter added here :)-->
+    <div class="newsletter">
+    <div class="container">
+      <h3>Like the Funion? Consider joining our newsletter!</h3>
+      <input type="text">
+      <button type="button" onclick="getFocus()">Sign up</button></div><!--add onclick-->
+      
+    </div>
+  </div>
   <footer>
+    <div class="container">
+      <p>&copy; 2026 The Funion</p>
+    </div>
   </footer>
-  -->
+  
   
   <script>
     function getFocus() {
