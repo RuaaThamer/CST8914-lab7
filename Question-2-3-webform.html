@@ -36,29 +36,28 @@
     <h1>Feedback form</h1>
     <form>
       <div class="control">
-        <label>Full name <span class="required">*</span></label
+        <label for="name">Full name <span class="required">*</span></label
         ><input id="name" name="name" type="text" />
       </div>
       <div class="control">
-        <label>Biography</label
+        <label for="biography">Biography</label
         ><textarea id="biography" name="biography" type="text"></textarea>
         <span>Include examples on your skills in JavaScript.</span>
       </div>
 
-      <div>Gender</div>
-      <div class="control">
-        <input id="gender_male" name="gender" type="radio" value="male" /><label
-          >Male</label
-        >
-      </div>
-      <div class="control">
-        <input
-          id="gender_female"
-          name="gender"
-          type="radio"
-          value="female"
-        /><label>Female</label>
-      </div>
+      <fieldset>
+        <!--added fieldset-->
+        <legend>Gender</legend>
+        <div class="control">
+          <input id="gender_male" name="gender" type="radio" value="male" />
+          <label for="gender_male">Male</label>
+        </div>
+        <div class="control">
+          <input id="gender_female" name="gender" type="radio" value="female" />
+          <label for="gender_female">Female</label>
+        </div>
+        <!--add label for female-->
+      </fieldset>
 
       <div class="control">
         <input
@@ -66,7 +65,7 @@
           name="accept_agbs"
           type="checkbox"
           value="1"
-        /><label>I accept the terms and conditions</label>
+        /><label for="accept_agbs">I accept the terms and conditions</label>
       </div>
       <div class="control">
         <input name="validate" type="hidden" value="1" /><input
@@ -109,11 +108,12 @@
             $referencedElement,
             value;
           $input = $('[name="' + input + '"]');
-
-          if ((value = $.urlParam(input)) === null) {
+          //Added || value === "" to catch empty submissions
+          if ((value = $.urlParam(input)) === null || value === "") {
             if ($("fieldset.errors").length === 0) {
               $("form").prepend(
-                '<fieldset class="errors"><legend>Errors</legend><ul></ul></fieldset>',
+                //updated with role and tabindex
+                '<fieldset class="errors" role="alert" tabindex="-1"><legend>Errors</legend><ul></ul></fieldset>',
               );
             }
 
@@ -129,21 +129,26 @@
               $elementToDescribe = $input;
               $referencedElement = $input;
             }
-            //  fixed next line ;)
-            $error = $('<a href="#' + input + '">' + message + "</a>");
+            //  fixed added href="#" so it's a keyboard-accessible link ;)
+            $error = $(
+              '<a href="#' +
+                input +
+                '" id="' +
+                input +
+                '_description">' +
+                message +
+                "</a>",
+            );
             $error.click(function (e) {
-              // If we rely on the link's href pointing to the input's ID, it doesn't trigger forms mode in screen readers
+              // Preventing default link behavior because we are manually managing focus below
+              e.preventDefault();
+              // This moves the focus to the actual input field when the link is clicked
               $referencedElement.focus();
-              return e.preventDefault();
             });
+
             $elementToDescribe.attr("aria-describedby", input + "_description");
             $errorContainer.append("<li>").find("li:last").append($error);
-
-            if ($(":not(form):focus").length === 0) {
-              // See https://stackoverflow.com/questions/46134247/jquery-setting-focus-doesnt-work-in-ie11/
-              // FIXED: Move focus to the first error link in the list so screen readers announce the error
-              $("fieldset.errors ul li:first-child a").focus();
-            }
+            return false; // CHANGE: Return false so we know there is an error
           } else {
             if ($input.is(":checkbox")) {
               $input.attr("checked", true);
@@ -161,25 +166,25 @@
 
         $(document).ready(function () {
           if ($.urlParam("validate")) {
-            validateInput("name", "Please enter your name!");
-            validateInput(
+            // CHANGE: Store the result (true/false) of each validation
+            var v1 = validateInput("name", "Please enter your name!");
+            var v2 = validateInput(
               "biography",
               "Please tell us something about your history!",
             );
-            validateInput("gender", "Please tell us your gender!");
-            validateInput(
+            var v3 = validateInput("gender", "Please tell us your gender!");
+            var v4 = validateInput(
               "accept_agbs",
               "You must accept our terms and conditions!",
             );
 
-            // FIXED: Changed check from .error to fieldset.errors (Requirement 1)
-            // This ensures the alert only appears if the error container was NOT created.
-            if ($("fieldset.errors").length === 0) {
+            // CHANGE: Check if ALL fields returned true
+            if (v1 && v2 && v3 && v4) {
               return alert("All inputs are valid.");
             } else {
-              // FIXED: Focus management (Requirement 2)
-              // This ensures screen readers announce the first error immediately.
-              $("fieldset.errors ul li:first-child a").focus();
+              // CHANGE: Focus management - move focus to the errors area
+              // This ensures screen reader users hear the errors immediately
+              $(".errors").focus();
             }
           }
         });
